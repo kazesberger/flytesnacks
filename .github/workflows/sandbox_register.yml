@@ -75,7 +75,7 @@ jobs:
         run: echo "::set-output name=id::$(echo ${{ matrix.directory }} | sed 's_/_-_g')"
       - name: setup download artifact dir
         run: |
-          make download-artifact
+          mkdir download-artifact
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
@@ -108,7 +108,7 @@ jobs:
         run: echo "::set-output name=id::$(echo ${{ matrix.directory }} | sed 's_/_-_g')"
       - name: setup download artifact dir
         run: |
-          make download-artifact
+          mkdir download-artifact
       - name: Download artifacts
         uses: actions/download-artifact@v2
         with:
