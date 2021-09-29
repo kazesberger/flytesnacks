@@ -33,11 +33,15 @@ jobs:
       - name: 'Set example name'
         id: example_id
         # add a step output `steps.build_id.outputs.id` as the unique id
-        run: echo "::set-output name=id::$(basename -- ${{ matrix.directory }})"
+        run: |
+          echo "::set-output name=id::$(basename -- ${{ matrix.directory }})"
+          temp=${{ matrix.directory }}
+          echo "::set-output name=path::$(echo "${temp%/*}/")"
       - name: Build & Push Docker Image to Github Registry
         uses: whoan/docker-build-with-cache-action@v5
         env:
           NAME: ${{ steps.example_id.outputs.id }}
+          PATH: ${{ steps.example_id.outputs.path }}
         with:
           # https://docs.github.com/en/packages/learn-github-packages/publishing-a-package
           username: "${{ secrets.FLYTE_BOT_USERNAME }}"
@@ -48,5 +52,5 @@ jobs:
           push_git_tag: ${{ github.event_name != 'pull_request' }}
           push_image_and_stages: ${{ github.event_name != 'pull_request' }}
           build_extra_args: "--compress=true --build-arg=tag=ghcr.io/${{ github.repository_owner }}/flytecookbook:${{ env.NAME }}-${{ github.sha }}"
-          context: ../${{ matrix.directory }}
+          context: ${{ env.PATH }}
           dockerfile: ${{ env.NAME }}/Dockerfile
